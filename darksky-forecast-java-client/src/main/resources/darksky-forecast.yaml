@@ -1,0 +1,333 @@
+swagger: "2.0"
+info:
+  description: "Programming Exercise - Dark Sky API"
+  version: "0.0.1-SNAPSHOT"
+  title: "Dark Sky API"
+externalDocs:
+  description: "Dark Sky API Request Types - Forecast Request"
+  url: "https://darksky.net/dev/docs#forecast-request"
+host: "api.darksky.net"
+basePath: "/"
+schemes:
+- "https"
+paths:
+  /forecast/{key}/{latLong}:
+    get:
+      tags:
+      - "Forecast"
+      summary: "Forecast Request"
+      description: "A Forecast Request returns the current weather conditions, a minute-by-minute forecast for the next hour (where available), an hour-by-hour forecast for the next 48 hours, and a day-by-day forecast for the next week."
+      operationId: "getLocalForecast"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "key"
+        in: "path"
+        description: "Your Dark Sky secret key."
+        required: true
+        type: "string"
+      - name: "latLong"
+        in: "path"
+        description: "The latitude of a location (in decimal degrees; positive is north, negative is south) and longitude of a location (in decimal degrees; positive is east, negative is west)."
+        required: true
+        type: "string"
+      - name: "exclude"
+        in: "query"
+        description: "Exclude some number of data blocks from the API response. This is useful for reducing latency and saving cache space. The value blocks should be a comma-delimeted list (without spaces) of any of the following: currently, minutely, hourly, daily, alerts, and flags"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - name: "extend"
+        in: "query"
+        description: "When present, return hour-by-hour data for the next 168 hours, instead of the next 48."
+        required: false
+        type: "string"
+      - name: "lang"
+        in: "query"
+        description: "Return summary properties in the desired language. (Note that units in the summary will be set according to the units parameter, so be sure to set both parameters appropriately.)"
+        required: false
+        type: "string"
+        enum:
+        - "ar"
+        - "az"
+        - "be"
+        - "bg"
+        - "bn"
+        - "bs"
+        - "ca"
+        - "cs"
+        - "da"
+        - "de"
+        - "el"
+        - "en"
+        - "eo"
+        - "es"
+        - "et"
+        - "fi"
+        - "fr"
+        - "he"
+        - "hi"
+        - "hr"
+        - "hu"
+        - "id"
+        - "is"
+        - "it"
+        - "ja"
+        - "ka"
+        - "kn"
+        - "ko"
+        - "kw"
+        - "lv"
+        - "ml"
+        - "mr"
+        - "nb"
+        - "nl"
+        - "no"
+        - "pa"
+        - "pl"
+        - "pt"
+        - "ro"
+        - "ru"
+        - "sk"
+        - "sl"
+        - "sr"
+        - "sv"
+        - "ta"
+        - "te"
+        - "tet"
+        - "tr"
+        - "uk"
+        - "ur"
+        - "x-pig-latin"
+        - "zh"
+        - "zh-tw"
+        default: "en"
+      - name: "units"
+        in: "query"
+        description: "Return weather conditions in the requested units."
+        required: false
+        type: "string"
+        enum:
+        - "auto"
+        - "ca"
+        - "uk2"
+        - "us"
+        - "si"
+        default: "auto"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Forecast"
+        400:
+          description: "Bad request"
+definitions:
+  Forecast:
+    type: "object"
+    properties:
+      latitude:
+        type: "number"
+      longitude:
+        type: "number"
+      timezone:
+        type: "string"
+      offset:
+        type: "string"
+      currently:
+        $ref: "#/definitions/DataPoint"
+      minutely:
+        $ref: "#/definitions/DataBlock"
+      hourly:
+        $ref: "#/definitions/DataBlock"
+      daily:
+        $ref: "#/definitions/DataBlock"
+      alerts:
+        type: "array"
+        items:
+          $ref: "#/definitions/Alert"
+      flags:
+        $ref: "#/definitions/Flags"
+  DataPoint:
+    type: "object"
+    properties:
+      apparentTemperature:
+        type: "number"
+      apparentTemperatureHigh:
+        type: "number"
+      apparentTemperatureHighTime:
+        type: "string"
+        format: "date-time"
+      apparentTemperatureLow:
+        type: "number"
+      apparentTemperatureLowTime:
+        type: "string"
+        format: "date-time"
+      apparentTemperatureMax:
+        type: "number"
+      apparentTemperatureMaxTime:
+        type: "string"
+        format: "date-time"
+      apparentTemperatureMin:
+        type: "number"
+      apparentTemperatureMinTime:
+        type: "string"
+        format: "date-time"
+      cloudCover:
+        type: "number"
+      dewPoint:
+        type: "number"
+      humidity:
+        type: "number"
+      icon:
+        type: "string"
+        enum:
+        - "clear-day"
+        - "clear-night"
+        - "rain"
+        - "snow"
+        - "sleet"
+        - "wind"
+        - "fog"
+        - "cloudy"
+        - "partly-cloudy-day"
+        - "partly-cloudy-night"
+      moonPhase:
+        type: "number"
+      nearestStormBearing:
+        type: "number"
+      nearestStormDistance:
+        type: "number"
+      ozone:
+        type: "number"
+      precipAccumulation:
+        type: "number"
+      precipIntensity:
+        type: "number"
+      precipIntensityError:
+        type: "number"
+      precipIntensityMax:
+        type: "number"
+      precipIntensityMaxTime:
+        type: "string"
+        format: "date-time"
+      precipProbability:
+        type: "number"
+      precipType:
+        type: "string"
+        enum:
+        - "rain"
+        - "snow"
+        - "sleet"
+      pressure:
+        type: "number"
+      summary:
+        type: "string"
+      sunriseTime:
+        type: "string"
+        format: "date-time"
+      sunsetTime:
+        type: "string"
+        format: "date-time"
+      temperature:
+        type: "number"
+      temperatureHigh:
+        type: "number"
+      temperatureHighTime:
+        type: "string"
+        format: "date-time"
+      temperatureLow:
+        type: "number"
+      temperatureLowTime:
+        type: "string"
+        format: "date-time"
+      temperatureMax:
+        type: "number"
+      temperatureMaxTime:
+        type: "string"
+        format: "date-time"
+      temperatureMin:
+        type: "number"
+      temperatureMinTime:
+        type: "string"
+        format: "date-time"
+      time:
+        type: "string"
+        format: "date-time"
+      uvIndex:
+        type: "number"
+      uvIndexTime:
+        type: "string"
+        format: "date-time"
+      visibility:
+        type: "number"
+      windBearing:
+        type: "number"
+      windGust:
+        type: "number"
+      windGustTime:
+        type: "string"
+        format: "date-time"
+      windSpeed:
+        type: "number"
+  DataBlock:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/DataPoint"
+      summary:
+        type: "string"
+      icon:
+        type: "string"
+        enum:
+        - "clear-day"
+        - "clear-night"
+        - "rain"
+        - "snow"
+        - "sleet"
+        - "wind"
+        - "fog"
+        - "cloudy"
+        - "partly-cloudy-day"
+        - "partly-cloudy-night"
+  Alert:
+    type: "object"
+    properties:
+      description:
+        type: "string"
+      expires:
+        type: "string"
+        format: "date-time"
+      regions:
+        type: "array"
+        items:
+          type: "string"
+      severity:
+        type: "string"
+        enum:
+        - "advisory"
+        - "watch"
+        - "warning"
+      time:
+        type: "string"
+        format: "date-time"
+      title:
+        type: "string"
+      uri:
+        type: "string"
+        format: "uri"
+  Flags:
+    type: "object"
+    properties:
+      darksky-unavailable:
+        type: "string"
+      nearest-station:
+        type: "number"
+      sources:
+        type: "array"
+        items:
+          type: "string"
+      units:
+        type: "string"
