@@ -34,42 +34,48 @@
   </head>
   <body class="bg-light">
     <div class="container">
-      <div class="py-5 text-center">
-        <img class="d-block mx-auto mb-4" src="{{ site.baseurl }}/docs/{{ site.docs_version }}/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
-        <h2>Checkout form</h2>
-        <p class="lead">Below is an example form built entirely with Bootstrap’s form controls. Each required form group has a validation state that can be triggered by attempting to submit the form without completing it.</p>
-      </div>
-
       <div class="row">
         <!-- Right panel -->
         <div class="col-md-4 order-md-2 mb-4">
           <h4 class="d-flex justify-content-between align-items-center mb-3">
-            <span class="text-muted">Your cart</span>
-            <span class="badge badge-secondary badge-pill">3</span>
+            <span class="text-muted">Locations</span>
           </h4>
           <ul class="list-group mb-3">
-            <li class="list-group-item d-flex justify-content-between lh-condensed">
-              <div>
-                <h6 class="my-0">Product name</h6>
-                <small class="text-muted">Brief description</small>
-              </div>
-              <span class="text-muted">$12</span>
-            </li>
             <li th:each="location : ${locations}" class="list-group-item d-flex justify-content-between">
-              <span th:text=${location.getName()}></span>
-              <strong>$20</strong>
+              <a th:text=${location.getName()} th:href="@{/weather(location=${location.getName()})}"></a>
             </li>
           </ul>
         </div>
 
         <!-- Center panel -->
         <div class="col-md-8 order-md-1">
+          <h2 class="d-flex mb-3">Weather Forecast</h2>
+          <p class="lead">
+            By the hour weather forecast using the <a href="https://darksky.net/">Dark Sky API</a>. Change the location
+            by clicking the other locations in the list.
+          </p>
           <div class="card">
             <div class="card-body">
               <h5 class="card-title" th:text="${weather.getLocation().getName()}"></h5>
               <p class="card-text" th:text="${weather.getSummary()}"></p>
-              <a href="#" class="card-link">Card link</a>
-              <a href="#" class="card-link">Another link</a>
+
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Time <small class="text-muted">(<span th:text="${weather.getTimezone()}"></span>)</small></th>
+                    <th scope="col">Summary</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="hourlyForecast : ${#lists.sort(weather.getHourlyForecasts())}">
+                    <th scope="row" th:text="${#temporals.format(hourlyForecast.getTime(), 'HH:mm')}"></th>
+                    <td>
+                      <div><span th:text="${hourlyForecast.getTemperature()}"></span> &#8457;</div>
+                      <div th:text="${hourlyForecast.getSummary()}"></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -77,11 +83,6 @@
 
       <footer class="my-5 pt-5 text-muted text-center text-small">
         <p class="mb-1">&copy; 2020 Glenn De Paula</p>
-        <ul class="list-inline">
-          <li class="list-inline-item"><a href="#">Privacy</a></li>
-          <li class="list-inline-item"><a href="#">Terms</a></li>
-          <li class="list-inline-item"><a href="#">Support</a></li>
-        </ul>
       </footer>
     </div>
 

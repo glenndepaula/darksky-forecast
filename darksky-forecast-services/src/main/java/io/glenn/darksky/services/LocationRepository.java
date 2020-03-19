@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 
 public interface LocationRepository extends MongoRepository<Location, Long> {
 
-    public Location findByLatitudeAndLongitude(BigDecimal latitude, BigDecimal longitude);
+    Location findByLatitudeAndLongitude(BigDecimal latitude, BigDecimal longitude);
+
+    Location findByName(String name);
 
 }

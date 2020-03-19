@@ -1,13 +1,11 @@
 package io.glenn.darksky.data;
 
-import org.springframework.data.annotation.Id;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import java.math.BigDecimal;
 
 @Entity
-public class Location {
+public class Location implements Comparable {
 
     @Column
     private String name;
@@ -42,6 +40,16 @@ public class Location {
 
     public void setLongitude(BigDecimal longitude) {
         this.longitude = longitude;
+    }
+
+    @Override
+    public int compareTo(Object other) {
+        if(other instanceof Location) {
+            Location otherLocation = (Location) other;
+            if(otherLocation.getLatitude().equals(this.latitude))
+                return otherLocation.getLongitude().compareTo(this.longitude);
+            else return otherLocation.getLatitude().compareTo(this.latitude);
+        } else return Integer.MAX_VALUE;
     }
 
     @Override

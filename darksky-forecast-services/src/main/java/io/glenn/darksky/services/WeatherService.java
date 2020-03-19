@@ -8,10 +8,12 @@ import io.glenn.darksky.data.Location;
 import io.glenn.darksky.data.Weather;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Example;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -37,15 +39,17 @@ public class WeatherService {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Transactional
     public Weather getWeather(Location location) {
         return getWeather(location, OffsetDateTime.now());
     }
 
+    @Transactional
     public Weather getWeather(Location location, OffsetDateTime dateTime) {
         OffsetDateTime startDateTime = OffsetDateTime.ofInstant(Instant.ofEpochSecond(dateTime.atZoneSameInstant(ZoneId.of("GMT")).toEpochSecond()), ZoneId.of("GMT"));
         OffsetDateTime endDateTime = startDateTime.plusHours(24L).minusNanos(1L);
 
-        Query query = new Query().addCriteria(Criteria.where("time").gte(startDateTime).lt(endDateTime));
+        Query query = new Query().addCriteria(Criteria.where("time").gte(startDateTime).lt(endDateTime).andOperator(Criteria.byExample(Example.of(location))));
         Weather weather = mongoTemplate.findOne(query, Weather.class);
 
         if(weather == null) {
@@ -53,7 +57,7 @@ public class WeatherService {
             Forecast forecast = forecastApi.getLocalForecast(key, location.getLatitude() + "," + location.getLongitude(), exclude, null, null, null);
 
             weather = new Weather();
-            weather.setLocation(locationRepository.findByLatitudeAndLongitude(location.getLatitude(), location.getLongitude()));
+            weather.setLocation(locationRepository.findByLatitudeAndLongitude(forecast.getLatitude(), forecast.getLongitude()));
             weather.setTimezone(forecast.getTimezone());
             weather.setSummary(forecast.getDaily().getSummary());
             DataPoint dataPoint = forecast.getDaily().getData().get(0);
@@ -70,9 +74,13 @@ public class WeatherService {
                 hourlyForecast.setTime(convertToJavaGmt(dp.getTime()));
                 hourlyForecast.setTimezone(weather.getTimezone());
                 hourlyForecast.setTemperature(dp.getTemperature());
-                hourlyForecast.setWeather(weather);
                 weather.addHourlyForecast(hourlyForecast);
             }
+
+            weatherRepository.save(weather);
+
+            OffsetDateTime threeDaysFromNow = OffsetDateTime.now().plusDays(3);
+            weatherRepository.deleteAll(mongoTemplate.find(new Query().addCriteria(Criteria.where("time").gte(threeDaysFromNow)), Weather.class));
         }
 
         return weather;

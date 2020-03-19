@@ -4,7 +4,6 @@ import org.springframework.core.convert.converter.Converter;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Date;
 
 public class OffsetDateTimeWriteConverter implements Converter<OffsetDateTime, Date> {

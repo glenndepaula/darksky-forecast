@@ -1,13 +1,11 @@
 package io.glenn.darksky.data;
 
-import org.springframework.data.annotation.Id;
-
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Entity
-public class HourlyForecast {
+public class HourlyForecast implements Comparable {
 
     @Column
     private String summary;
@@ -20,10 +18,6 @@ public class HourlyForecast {
 
     @Column
     private BigDecimal temperature;
-
-    @ManyToOne
-    @JoinColumn(name = "weather_id")
-    private Weather weather;
 
     public HourlyForecast() { }
 
@@ -59,18 +53,17 @@ public class HourlyForecast {
         this.temperature = temperature;
     }
 
-    public Weather getWeather() {
-        return weather;
-    }
-
-    public void setWeather(Weather weather) {
-        this.weather = weather;
+    @Override
+    public int compareTo(Object other) {
+        if(other instanceof HourlyForecast)
+            return this.time.compareTo(((HourlyForecast) other).getTime());
+        else return Integer.MAX_VALUE;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "HourlyForecast[location=%s, time=%s, temperature=%d]",
-                weather.getLocation().toString(), time.toString(), temperature);
+                "HourlyForecast[time=%s, temperature=%d]",
+                time.toString(), temperature);
     }
 }

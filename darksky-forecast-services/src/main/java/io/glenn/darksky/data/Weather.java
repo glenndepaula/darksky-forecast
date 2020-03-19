@@ -1,7 +1,5 @@
 package io.glenn.darksky.data;
 
-import org.springframework.data.annotation.Id;
-
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
